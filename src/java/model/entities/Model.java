@@ -4,35 +4,66 @@
  */
 package model.entities;
 
+import model.entities.modelCharacteristics.Provider;
 import jakarta.persistence.*;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
-import java.util.Set;
-import model.entities.enums.Capacity;
-import model.entities.enums.License;
+//import java.util.Date;
+import java.util.LinkedList;
+import model.entities.modelCharacteristics.Capacity;
+import model.entities.modelCharacteristics.License;
 /**
  *
  * @author guillermo
  */
 @Entity
 @XmlRootElement
-public class Model {
-    
-    @Id
+public class Model implements Serializable{
+    private static final long serialVersionUID = 1L;
+    @Id 
+    @SequenceGenerator(name="Model_Gen", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Model_Gen")
     private int id;
+   
+    private String name;
+    @Column(name="DESCR")
+    private String description;
+    @Column(name="CL")
+    private int contextLenght;
+    @Column(name="QI")
+    private float qualityIndex;
+    
+    @Temporal(TemporalType.DATE)
+    @Column(name="TRAIN_D")
+    private Date trainingDate;  
+    @Temporal(TemporalType.DATE)
+    @Column(name="LAST_D")
+    private Date lastUpdateDate ;  
+    
+    private String version;
+    @Column(name="N_LANG")
+    private int numLanguages;
     
     @ManyToOne
-    @JoinColumn(name = "PROVIDER_ID")
-    private Provider provider;
+    @JoinColumn(name="PROVIDER_ID")
+    private Provider provider;    
     
-    private Set<Capacity> capacities;    
-    private License license;    
-    private Date trainingDate;  
-    private String version;
+    @ManyToOne
+     @JoinColumn(name="LICENSE_ID")
+    private License license;  
     
+    @ManyToMany
+    @JoinTable(
+        name = "MODEL_CAPACITY",
+        joinColumns = @JoinColumn(name = "CAP_ID"),
+        inverseJoinColumns = @JoinColumn(name = "MODEL_ID"))
+    private Collection<Capacity> capacities;
     
-    public Model(){}
+    public Model(){
+        capacities = new LinkedList<Capacity>();
+    }
     
 
     //Setters and getters
@@ -45,7 +76,7 @@ public class Model {
         return provider;
     }
 
-    public Set<Capacity> getCapacities() {
+    public Collection<Capacity> getCapacities() {
         return capacities;
     }
 
@@ -57,6 +88,36 @@ public class Model {
         return trainingDate;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public int getContextLenght() {
+        return contextLenght;
+    }
+
+    public float getQualityIndex() {
+        return qualityIndex;
+    }
+
+    public Date getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public int getNumLanguages() {
+        return numLanguages;
+    }
+
+    
+    
     public void setId(int id) {
         this.id = id;
     }
@@ -65,7 +126,7 @@ public class Model {
         this.provider = provider;
     }
 
-    public void setCapacities(Set<Capacity> capacities) {
+    public void setCapacities(Collection<Capacity> capacities) {
         this.capacities = capacities;
     }
 
@@ -75,6 +136,34 @@ public class Model {
 
     public void setTrainingDate(Date trainingDate) {
         this.trainingDate = trainingDate;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setContextLenght(int contextLenght) {
+        this.contextLenght = contextLenght;
+    }
+
+    public void setQualityIndex(float qualityIndex) {
+        this.qualityIndex = qualityIndex;
+    }
+
+    public void setLastUpdateDate(Date lastUpdate) {
+        this.lastUpdateDate = lastUpdate;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public void setNumLanguages(int numLanguages) {
+        this.numLanguages = numLanguages;
     }
     
     

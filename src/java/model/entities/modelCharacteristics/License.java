@@ -4,7 +4,11 @@
  */
 package model.entities.modelCharacteristics;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
@@ -14,33 +18,32 @@ import java.io.Serializable;
  */
 @Entity
 @XmlRootElement
-public class Provider implements Serializable {
+public class License implements Serializable{
     private static final long serialVersionUID = 1L;
     @Id
-    @SequenceGenerator(name="Provider_Gen", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Provider_Gen")
+    @SequenceGenerator(name="License_Gen", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "License_Gen")
     private int id;
     
-    private String name;
+    String name;
     
-    
-    public Provider(){}
-    
-    //Setters and getters
-    
+    public License(){}
+
     public int getId() {
         return id;
     }
-    
-    public String getName(){
-        return this.name;
+
+    public String getName() {
+        return name;
     }
 
     public void setId(int id) {
         this.id = id;
     }
-    
-    public void setName(String name){
+
+    public void setName(String name) {
         this.name = name;
     }
+    
+    
 }

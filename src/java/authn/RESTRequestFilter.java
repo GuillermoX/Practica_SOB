@@ -32,7 +32,7 @@ public class RESTRequestFilter implements ContainerRequestFilter {
     @Context
     private ResourceInfo resourceInfo;
 
-    @PersistenceContext(unitName = "sob_grup_27")
+    @PersistenceContext(unitName = "homework1")
     private EntityManager em;
 
     @Override

@@ -18,10 +18,10 @@ import authn.Secured;
 import jakarta.ws.rs.core.Response;
 
 @Stateless
-@Path("comment")
+//@Path("comment")
 public class CommentFacadeREST extends AbstractFacade<Comment> {
 
-    @PersistenceContext(unitName = "Homework1PU")
+    @PersistenceContext(unitName = "homework1")
     private EntityManager em;
 
     public CommentFacadeREST() {
