@@ -26,7 +26,7 @@
              * 
              * If there is any problem, it will exit at the very first error.
              */
-            String dbname = "homework1";
+            String dbname = "sob_grup_27";
             String schema = "ROOT";
             Class.forName("org.apache.derby.jdbc.ClientDriver");
             /* this will generate database if not exist */
@@ -51,7 +51,11 @@
                 "INSERT INTO " + schema + ".MODEL(ID, NAME, DESCR, CL, QI, TRAIN_D, LAST_D, VERSION, N_LANG, PROVIDER_ID, LICENSE_ID) " +
                                             "VALUES (NEXT VALUE FOR MODEL_GEN, 'o3-pro', 'o3-pro model of OpenAI', 20000, " + 
                                                       " 0.91, {d '2024-05-01'}, {d '2025-07-01'},'2025-06-10', 27, 1, 3)",
-                "INSERT INTO " + schema + ".MODEL_CAPACITY VALUES (1, 1)"
+                "INSERT INTO " + schema + ".MODEL(ID, NAME, DESCR, CL, QI, TRAIN_D, LAST_D, VERSION, N_LANG, PROVIDER_ID, LICENSE_ID) " +
+                                            "VALUES (NEXT VALUE FOR MODEL_GEN, 'gemini', 'gemini of Google', 20000, " + 
+                                                      " 0.91, {d '2024-05-01'}, {d '2025-07-01'},'2025-06-10', 27, 2, 3)",
+                "INSERT INTO " + schema + ".MODEL_CAPACITY VALUES (1, 1)",
+                "INSERT INTO " + schema + ".MODEL_CAPACITY VALUES (2, 2)"
             };
             for (String datum : data) {
                 if (stmt.executeUpdate(datum)<=0) {

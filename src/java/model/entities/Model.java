@@ -6,7 +6,9 @@ package model.entities;
 
 import model.entities.modelCharacteristics.Provider;
 import jakarta.persistence.*;
+import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
@@ -14,11 +16,18 @@ import java.util.Date;
 import java.util.LinkedList;
 import model.entities.modelCharacteristics.Capacity;
 import model.entities.modelCharacteristics.License;
+import service.DateAdapter;
 /**
  *
  * @author guillermo
  */
+
 @Entity
+@NamedQueries({
+    @NamedQuery(name = "Model.findByProvider",
+                query = "SELECT e FROM Model e " +
+                        "WHERE e.provider.name = :prov_name")
+})
 @XmlRootElement
 public class Model implements Serializable{
     private static final long serialVersionUID = 1L;
@@ -37,9 +46,14 @@ public class Model implements Serializable{
     
     @Temporal(TemporalType.DATE)
     @Column(name="TRAIN_D")
+    @XmlElement
+    @XmlJavaTypeAdapter(value = DateAdapter.class, type = Date.class)
     private Date trainingDate;  
+    
     @Temporal(TemporalType.DATE)
     @Column(name="LAST_D")
+    @XmlElement
+    @XmlJavaTypeAdapter(value = DateAdapter.class, type = Date.class)
     private Date lastUpdateDate ;  
     
     private String version;
