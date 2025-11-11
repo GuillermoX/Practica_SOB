@@ -54,8 +54,9 @@
                 "INSERT INTO " + schema + ".MODEL(ID, NAME, DESCR, CL, QI, TRAIN_D, LAST_D, VERSION, N_LANG, PROVIDER_ID, LICENSE_ID) " +
                                             "VALUES (NEXT VALUE FOR MODEL_GEN, 'gemini', 'gemini of Google', 20000, " + 
                                                       " 0.91, {d '2024-05-01'}, {d '2025-07-01'},'2025-06-10', 27, 2, 3)",
-                "INSERT INTO " + schema + ".MODEL_CAPACITY VALUES (1, 1)",
-                "INSERT INTO " + schema + ".MODEL_CAPACITY VALUES (2, 2)"
+                "INSERT INTO " + schema + ".MODEL_CAPACITY(MODEL_ID, CAP_ID) VALUES (1, 1)",
+                "INSERT INTO " + schema + ".MODEL_CAPACITY(MODEL_ID, CAP_ID) VALUES (1, 2)",
+                "INSERT INTO " + schema + ".MODEL_CAPACITY(MODEL_ID, CAP_ID) VALUES (2, 2)"
             };
             for (String datum : data) {
                 if (stmt.executeUpdate(datum)<=0) {

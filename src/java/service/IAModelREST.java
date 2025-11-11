@@ -13,6 +13,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.List;
 import model.entities.Comment;
 import model.entities.Model;
 
@@ -26,13 +27,13 @@ import model.entities.Model;
  * @author guillermo
  */
 @Stateless
-@Path("models")
+@Path("/models")
 public class IAModelREST {
-    
     
     
     @PersistenceContext(unitName = "homework1")
     private EntityManager em;
+    
     
     
     @POST
@@ -41,12 +42,13 @@ public class IAModelREST {
         em.persist(entity);
     }
     
-    /*@GET
+    @GET
     @Path("{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response find(@PathParam("id") int id) {
         return Response.ok().entity(em.find(Model.class, id)).build();
-    }*/
+    }
+    
     
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -55,42 +57,43 @@ public class IAModelREST {
                                 @QueryParam("capability2") String cap2,
                                 @QueryParam("provider") String prov
                             ) {
-            TypedQuery<Model> query = em.createNamedQuery("Model.findByProvider", Model.class);
-            Model model = query.setParameter("prov_name", prov)
-                            .getSingleResult();
+            //General query
+            String jpql = "SELECT m FROM Model m WHERE 1=1";
+            //Subquery to capabilities filter
+            String subpql = " (SELECT c.name FROM Model m2 JOIN m2.capabilities c WHERE m2.name = m.name)";
             
-            String jpql = "SELECT m FROM Model m"; // 1=1 facilita concatenar
-            String capacities = "(SELECT c.name FROM Model JOIN m.capacities c)";
-            
-            jpql += " WHERE 1=1";
-            
+            //Only insert the condition if filter specified
             if (cap1 != null && !cap1.isEmpty()) {
-                jpql += " AND :cap1_name IN " + capacities;
+                jpql += " AND :cap1_name IN" + subpql;
             }
             if (cap2 != null && !cap2.isEmpty()) {
-                jpql += " AND :cap2_name IN " + capacities;
+                jpql += " AND :cap2_name IN" + subpql;
             }
             if (prov != null && !prov.isEmpty()) {
                 jpql += " AND m.provider.name = :prov_name";
             }
             
-            TypedQuery<Model> query2 = em.createQuery(jpql, Model.class);
-
+            jpql += " ORDER BY m.name";
+            
+            //Create the query
+            TypedQuery<Model> query = em.createQuery(jpql, Model.class);
+            
+            //Only insert the parameter if specified
             if (cap1 != null && !cap1.isEmpty()) {
-                query2.setParameter("cap1_name", cap1);
+                query.setParameter("cap1_name", cap1);
             }
             if (cap2 != null && !cap2.isEmpty()) {
-                query2.setParameter("cap2_name", cap2);
+                query.setParameter("cap2_name", cap2);
             }
             if (prov != null && !prov.isEmpty()) {
-                query2.setParameter("prov_name", prov);
+                query.setParameter("prov_name", prov);
             }
             
-            Model model2 = query2.getSingleResult();
+            List<Model> models = query.getResultList();
             
-            return Response.ok().entity(model2).build();
+            return Response.ok().entity(models).build();
         
     }
 
-    
+
 }

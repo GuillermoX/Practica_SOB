@@ -73,10 +73,10 @@ public class Model implements Serializable{
         name = "MODEL_CAPACITY",
         joinColumns = @JoinColumn(name = "CAP_ID"),
         inverseJoinColumns = @JoinColumn(name = "MODEL_ID"))
-    private Collection<Capacity> capacities;
+    private Collection<Capacity> capabilities;
     
     public Model(){
-        capacities = new LinkedList<Capacity>();
+        capabilities = new LinkedList<Capacity>();
     }
     
 
@@ -90,8 +90,8 @@ public class Model implements Serializable{
         return provider;
     }
 
-    public Collection<Capacity> getCapacities() {
-        return capacities;
+    public Collection<Capacity> getCapabilities() {
+        return capabilities;
     }
 
     public License getLicense() {
@@ -140,8 +140,8 @@ public class Model implements Serializable{
         this.provider = provider;
     }
 
-    public void setCapacities(Collection<Capacity> capacities) {
-        this.capacities = capacities;
+    public void setCapabilities(Collection<Capacity> capabilities) {
+        this.capabilities = capabilities;
     }
 
     public void setLicense(License license) {
