@@ -19,16 +19,16 @@ import java.io.Serializable;
  */
 @Entity
 @XmlRootElement
-public class Capacity implements Serializable {
+public class Capability implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
-    @SequenceGenerator(name="Capacity_Gen", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Capacity_Gen")
+    @SequenceGenerator(name="Cap_Gen", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Cap_Gen")
     private int id;
     
     String name;
 
-    public Capacity(){}
+    public Capability(){}
     
     public int getId() {
         return id;

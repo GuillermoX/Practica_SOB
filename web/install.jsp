@@ -38,8 +38,8 @@
             String data[] = new String[]{
                 "INSERT INTO " + schema + ".CREDENTIALS VALUES (NEXT VALUE FOR CREDENTIALS_GEN, 'sob', 'sob')",
                 
-                "INSERT INTO " + schema + ".CAPACITY VALUES (NEXT VALUE FOR CAPACITY_GEN, 'chat-completion')",
-                "INSERT INTO " + schema + ".CAPACITY VALUES (NEXT VALUE FOR CAPACITY_GEN, 'code-generation')",
+                "INSERT INTO " + schema + ".CAPABILITY VALUES (NEXT VALUE FOR CAP_GEN, 'chat-completion')",
+                "INSERT INTO " + schema + ".CAPABILITY VALUES (NEXT VALUE FOR CAP_GEN, 'code-generation')",
                 
                 "INSERT INTO " + schema + ".PROVIDER VALUES (NEXT VALUE FOR PROVIDER_GEN, 'OpenAi')",
                 "INSERT INTO " + schema + ".PROVIDER VALUES (NEXT VALUE FOR PROVIDER_GEN, 'Meta')",

@@ -13,8 +13,9 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
+import java.net.URI;
 import java.util.List;
-import model.entities.Comment;
 import model.entities.Model;
 
 /*
@@ -27,7 +28,7 @@ import model.entities.Model;
  * @author guillermo
  */
 @Stateless
-@Path("/models")
+@Path("v1/models")
 public class IAModelREST {
     
     
@@ -38,8 +39,17 @@ public class IAModelREST {
     
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void create(Comment entity) {
-        em.persist(entity);
+    public Response create(Model entity) {
+        try{
+            em.persist(entity);
+            URI uri = UriBuilder.fromResource(IAModelREST.class)
+                       .path(String.valueOf(entity.getId()))
+                        .build();
+            return Response.created(uri).build();
+        }
+        catch(Exception e){
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
     }
     
     @GET

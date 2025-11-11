@@ -14,9 +14,11 @@ import java.util.Collection;
 import java.util.Date;
 //import java.util.Date;
 import java.util.LinkedList;
-import model.entities.modelCharacteristics.Capacity;
+import model.entities.modelCharacteristics.Capability;
 import model.entities.modelCharacteristics.License;
-import service.DateAdapter;
+import service.FormatAdapters.CapabilityAdapter;
+import service.FormatAdapters.DateAdapter;
+import service.FormatAdapters.LicenseAdapter;
 /**
  *
  * @author guillermo
@@ -66,6 +68,8 @@ public class Model implements Serializable{
     
     @ManyToOne
      @JoinColumn(name="LICENSE_ID")
+    @XmlElement
+    @XmlJavaTypeAdapter(value = LicenseAdapter.class)
     private License license;  
     
     @ManyToMany
@@ -73,10 +77,13 @@ public class Model implements Serializable{
         name = "MODEL_CAPACITY",
         joinColumns = @JoinColumn(name = "CAP_ID"),
         inverseJoinColumns = @JoinColumn(name = "MODEL_ID"))
-    private Collection<Capacity> capabilities;
+    @XmlElement
+    @XmlJavaTypeAdapter(value = CapabilityAdapter.class)
+    private Collection<Capability> capabilities;
     
+   
     public Model(){
-        capabilities = new LinkedList<Capacity>();
+        capabilities = new LinkedList<Capability>();
     }
     
 
@@ -90,7 +97,7 @@ public class Model implements Serializable{
         return provider;
     }
 
-    public Collection<Capacity> getCapabilities() {
+    public Collection<Capability> getCapabilities() {
         return capabilities;
     }
 
@@ -140,7 +147,7 @@ public class Model implements Serializable{
         this.provider = provider;
     }
 
-    public void setCapabilities(Collection<Capacity> capabilities) {
+    public void setCapabilities(Collection<Capability> capabilities) {
         this.capabilities = capabilities;
     }
 
