@@ -38,6 +38,9 @@
             String data[] = new String[]{
                 "INSERT INTO " + schema + ".CREDENTIALS VALUES (NEXT VALUE FOR CREDENTIALS_GEN, 'sob', 'sob')",
                 
+                "INSERT INTO " + schema + ".CUSTOMER(ID, USR, PSW) VALUES (NEXT VALUE FOR CUSTOMER_GEN, 'guillermo', 'gpc')",
+                "INSERT INTO " + schema + ".CUSTOMER(ID, USR, PSW) VALUES (NEXT VALUE FOR CUSTOMER_GEN, 'alvaro', 'apc')",
+                
                 "INSERT INTO " + schema + ".CAPABILITY VALUES (NEXT VALUE FOR CAP_GEN, 'chat-completion')",
                 "INSERT INTO " + schema + ".CAPABILITY VALUES (NEXT VALUE FOR CAP_GEN, 'code-generation')",
                 
@@ -48,12 +51,12 @@
                 "INSERT INTO " + schema + ".LICENSE VALUES (NEXT VALUE FOR LICENSE_GEN, 'Propietary')",
                 "INSERT INTO " + schema + ".LICENSE VALUES (NEXT VALUE FOR LICENSE_GEN, 'Custom')",
                 
-                "INSERT INTO " + schema + ".MODEL(ID, NAME, DESCR, CL, QI, TRAIN_D, LAST_D, VERSION, N_LANG, PROVIDER_ID, LICENSE_ID) " +
+                "INSERT INTO " + schema + ".MODEL(ID, NAME, DESCR, CL, QI, PRIV, TRAIN_D, LAST_D, VERSION, N_LANG, PROVIDER_ID, LICENSE_ID) " +
                                             "VALUES (NEXT VALUE FOR MODEL_GEN, 'o3-pro', 'o3-pro model of OpenAI', 20000, " + 
-                                                      " 0.91, {d '2024-05-01'}, {d '2025-07-01'},'2025-06-10', 27, 1, 3)",
-                "INSERT INTO " + schema + ".MODEL(ID, NAME, DESCR, CL, QI, TRAIN_D, LAST_D, VERSION, N_LANG, PROVIDER_ID, LICENSE_ID) " +
+                                                      " 0.91, 0, {d '2024-05-01'}, {d '2025-07-01'},'2025-06-10', 27, 1, 3)",
+                "INSERT INTO " + schema + ".MODEL(ID, NAME, DESCR, CL, QI, PRIV, TRAIN_D, LAST_D, VERSION, N_LANG, PROVIDER_ID, LICENSE_ID) " +
                                             "VALUES (NEXT VALUE FOR MODEL_GEN, 'gemini', 'gemini of Google', 20000, " + 
-                                                      " 0.91, {d '2024-05-01'}, {d '2025-07-01'},'2025-06-10', 27, 2, 3)",
+                                                      " 0.91, 1, {d '2024-05-01'}, {d '2025-07-01'},'2025-06-10', 27, 2, 3)",
                 "INSERT INTO " + schema + ".MODEL_CAPACITY(MODEL_ID, CAP_ID) VALUES (1, 1)",
                 "INSERT INTO " + schema + ".MODEL_CAPACITY(MODEL_ID, CAP_ID) VALUES (1, 2)",
                 "INSERT INTO " + schema + ".MODEL_CAPACITY(MODEL_ID, CAP_ID) VALUES (2, 2)"

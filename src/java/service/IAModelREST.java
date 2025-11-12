@@ -1,11 +1,14 @@
 package service;
 
+import authn.Secured;
+import com.sun.xml.messaging.saaj.util.Base64;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -16,7 +19,9 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
-import model.entities.Model;
+import java.util.StringTokenizer;
+import model.entities.customer.Customer;
+import model.entities.model.Model;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -38,6 +43,7 @@ public class IAModelREST {
     
     
     @POST
+    @Secured
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response create(Model entity) {
         try{
@@ -55,8 +61,20 @@ public class IAModelREST {
     @GET
     @Path("{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response find(@PathParam("id") int id) {
-        return Response.ok().entity(em.find(Model.class, id)).build();
+    public Response find(@PathParam("id") int id, @HeaderParam("Authorization") String auth) {
+        Model model = em.find(Model.class, id);
+        Response res;
+        if(model != null){
+            if(model.isPriv() && !isCustomerRegistered(em, auth))
+                res = Response.status(401).build();    
+            else
+                res = Response.ok().entity(model).build();
+        }
+        else{
+            res = Response.status(404).build();    
+        }
+        
+        return res;
     }
     
     
@@ -106,4 +124,20 @@ public class IAModelREST {
     }
 
 
+    
+        
+    public static boolean isCustomerRegistered(EntityManager em, String auth){
+        if(auth == null) return false;
+        
+        auth = auth.replace("Basic ", "");
+        String decode = Base64.base64Decode(auth);
+        StringTokenizer tokenizer = new StringTokenizer(decode, ":");
+        String username = tokenizer.nextToken();
+        String password = tokenizer.nextToken();
+
+        List<Customer> customer = em.createNamedQuery("Customer.findByUserPsw", Customer.class)
+                .setParameter("user", username).setParameter("psw", password).getResultList();
+        return !customer.isEmpty();
+    }
+    
 }

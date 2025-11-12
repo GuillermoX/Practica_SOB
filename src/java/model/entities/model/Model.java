@@ -2,9 +2,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package model.entities;
+package model.entities.model;
 
-import model.entities.modelCharacteristics.Provider;
 import jakarta.persistence.*;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
@@ -14,8 +13,6 @@ import java.util.Collection;
 import java.util.Date;
 //import java.util.Date;
 import java.util.LinkedList;
-import model.entities.modelCharacteristics.Capability;
-import model.entities.modelCharacteristics.License;
 import service.FormatAdapters.CapabilityAdapter;
 import service.FormatAdapters.DateAdapter;
 import service.FormatAdapters.LicenseAdapter;
@@ -25,11 +22,6 @@ import service.FormatAdapters.LicenseAdapter;
  */
 
 @Entity
-@NamedQueries({
-    @NamedQuery(name = "Model.findByProvider",
-                query = "SELECT e FROM Model e " +
-                        "WHERE e.provider.name = :prov_name")
-})
 @XmlRootElement
 public class Model implements Serializable{
     private static final long serialVersionUID = 1L;
@@ -45,17 +37,19 @@ public class Model implements Serializable{
     private int contextLenght;
     @Column(name="QI")
     private float qualityIndex;
+    @Column(name="PRIV")
+    private boolean priv;
     
     @Temporal(TemporalType.DATE)
     @Column(name="TRAIN_D")
-    @XmlElement
-    @XmlJavaTypeAdapter(value = DateAdapter.class, type = Date.class)
+    //@XmlElement
+    //@XmlJavaTypeAdapter(value = DateAdapter.class, type = Date.class)
     private Date trainingDate;  
     
     @Temporal(TemporalType.DATE)
     @Column(name="LAST_D")
-    @XmlElement
-    @XmlJavaTypeAdapter(value = DateAdapter.class, type = Date.class)
+    //@XmlElement
+    //@XmlJavaTypeAdapter(value = DateAdapter.class, type = Date.class)
     private Date lastUpdateDate ;  
     
     private String version;
@@ -67,9 +61,8 @@ public class Model implements Serializable{
     private Provider provider;    
     
     @ManyToOne
-     @JoinColumn(name="LICENSE_ID")
-    @XmlElement
-    @XmlJavaTypeAdapter(value = LicenseAdapter.class)
+    //@JoinColumn(name="LICENSE_ID")
+    //@XmlJavaTypeAdapter(value = LicenseAdapter.class)
     private License license;  
     
     @ManyToMany
@@ -77,36 +70,21 @@ public class Model implements Serializable{
         name = "MODEL_CAPACITY",
         joinColumns = @JoinColumn(name = "CAP_ID"),
         inverseJoinColumns = @JoinColumn(name = "MODEL_ID"))
-    @XmlElement
-    @XmlJavaTypeAdapter(value = CapabilityAdapter.class)
+    //@XmlElement
+    //@XmlJavaTypeAdapter(value = CapabilityAdapter.class, type = Capability.class)
     private Collection<Capability> capabilities;
     
    
     public Model(){
         capabilities = new LinkedList<Capability>();
     }
-    
 
-    //Setters and getters
-    
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
     public int getId() {
         return id;
-    }
-
-    public Provider getProvider() {
-        return provider;
-    }
-
-    public Collection<Capability> getCapabilities() {
-        return capabilities;
-    }
-
-    public License getLicense() {
-        return license;
-    }
-
-    public Date getTrainingDate() {
-        return trainingDate;
     }
 
     public String getName() {
@@ -125,6 +103,10 @@ public class Model implements Serializable{
         return qualityIndex;
     }
 
+    public Date getTrainingDate() {
+        return trainingDate;
+    }
+
     public Date getLastUpdateDate() {
         return lastUpdateDate;
     }
@@ -137,26 +119,26 @@ public class Model implements Serializable{
         return numLanguages;
     }
 
+    public Provider getProvider() {
+        return provider;
+    }
+
+    public License getLicense() {
+        return license;
+    }
+
+    public Collection<Capability> getCapabilities() {
+        return capabilities;
+    }
+
+    public boolean isPriv() {
+        return priv;
+    }
     
     
+
     public void setId(int id) {
         this.id = id;
-    }
-
-    public void setProvider(Provider provider) {
-        this.provider = provider;
-    }
-
-    public void setCapabilities(Collection<Capability> capabilities) {
-        this.capabilities = capabilities;
-    }
-
-    public void setLicense(License license) {
-        this.license = license;
-    }
-
-    public void setTrainingDate(Date trainingDate) {
-        this.trainingDate = trainingDate;
     }
 
     public void setName(String name) {
@@ -175,8 +157,12 @@ public class Model implements Serializable{
         this.qualityIndex = qualityIndex;
     }
 
-    public void setLastUpdateDate(Date lastUpdate) {
-        this.lastUpdateDate = lastUpdate;
+    public void setTrainingDate(Date trainingDate) {
+        this.trainingDate = trainingDate;
+    }
+
+    public void setLastUpdateDate(Date lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
     }
 
     public void setVersion(String version) {
@@ -186,7 +172,25 @@ public class Model implements Serializable{
     public void setNumLanguages(int numLanguages) {
         this.numLanguages = numLanguages;
     }
+
+    public void setProvider(Provider provider) {
+        this.provider = provider;
+    }
+
+    public void setLicense(License license) {
+        this.license = license;
+    }
+
+    public void setCapabilities(Collection<Capability> capabilities) {
+        this.capabilities = capabilities;
+    }
+
+    public void setPriv(boolean priv) {
+        this.priv = priv;
+    }
     
+    
+ 
     
 
     

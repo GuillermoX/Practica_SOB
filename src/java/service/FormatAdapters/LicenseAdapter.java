@@ -5,8 +5,8 @@
 package service.FormatAdapters;
 
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
-import model.entities.modelCharacteristics.Capability;
-import model.entities.modelCharacteristics.License;
+import model.entities.model.Capability;
+import model.entities.model.License;
 
 public class LicenseAdapter extends XmlAdapter<String, License> {
 
