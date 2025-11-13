@@ -41,14 +41,10 @@ public class Model implements Serializable{
     
     @Temporal(TemporalType.DATE)
     @Column(name="TRAIN_D")
-    //@XmlElement
-    //@XmlJavaTypeAdapter(value = DateAdapter.class, type = Date.class)
     private Date trainingDate;  
     
     @Temporal(TemporalType.DATE)
     @Column(name="LAST_D")
-    //@XmlElement
-    //@XmlJavaTypeAdapter(value = DateAdapter.class, type = Date.class)
     private Date lastUpdateDate ;  
     
     private String version;
@@ -60,23 +56,31 @@ public class Model implements Serializable{
     private Provider provider;    
     
     @ManyToOne
-    //@JoinColumn(name="LICENSE_ID")
-    //@XmlJavaTypeAdapter(value = LicenseAdapter.class)
     private License license;  
     
     @ManyToMany
     @JoinTable(
         name = "MODEL_CAPACITY",
-        joinColumns = @JoinColumn(name = "CAP_ID"),
-        inverseJoinColumns = @JoinColumn(name = "MODEL_ID"))
-    //@XmlElement
-    //@XmlJavaTypeAdapter(value = CapabilityAdapter.class, type = Capability.class)
+        joinColumns = @JoinColumn(name = "MODEL_ID"),
+        inverseJoinColumns = @JoinColumn(name = "CAP_ID"))
     private Collection<Capability> capabilities;
     
    
     public Model(){
         capabilities = new LinkedList<Capability>();
     }
+    
+    public static boolean checkValues(Model m){
+        float qi = m.getQualityIndex();
+        int nLang = m.getNumLanguages();
+        
+        return((m.getName().isBlank() && m.getDescription().isBlank() &&
+                m.getDescription().isBlank() && m.getVersion().isBlank() &&
+                m.getVersion().isBlank() && (qi>=0) && (qi<=1) && (nLang>0) && 
+               (nLang<300) && (m.getContextLenght()>0)));
+        
+    }
+    
 
     public static long getSerialVersionUID() {
         return serialVersionUID;

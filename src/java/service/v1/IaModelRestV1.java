@@ -3,11 +3,13 @@ package service.v1;
 import authn.Secured;
 import com.sun.xml.messaging.saaj.util.Base64;
 import jakarta.ejb.Stateless;
+import jakarta.enterprise.inject.Default;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
@@ -15,11 +17,13 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import model.entities.customer.Customer;
 import model.entities.customer.CustomerLinks;
@@ -47,6 +51,8 @@ public class IaModelRestV1 {
     @Secured
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response create(Model entity) {
+        if(!Model.checkValues(entity))
+            return Response.status(Response.Status.BAD_REQUEST).entity("Unreasonable model values").build();
         em.persist(entity);
         URI uri = UriBuilder.fromResource(IaModelRestV1.class)
                    .path(String.valueOf(entity.getId()))
@@ -57,7 +63,7 @@ public class IaModelRestV1 {
     @GET
     @Path("{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response find(@PathParam("id") int id, @HeaderParam("Authorization") String auth) {
+    public Response find(@PathParam("id") int id,  @DefaultValue("") @HeaderParam(HttpHeaders.AUTHORIZATION) String auth) {
         Model model = em.find(Model.class, id);
         Response res;
         if(model != null){
@@ -85,10 +91,15 @@ public class IaModelRestV1 {
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response findQuery(
-                                @QueryParam("capability1") String cap1,
-                                @QueryParam("capability2") String cap2,
+                                @QueryParam("capability") List<String> caps,
                                 @QueryParam("provider") String prov
                             ) {
+            //Initialize capabilities variables
+            String cap1 = null;
+            String cap2 = null;
+            if(caps.size() == 1) cap1 = caps.get(0);
+            if(caps.size() == 2) cap2 = caps.get(1);
+        
             //General query
             String jpql = "SELECT m FROM Model m WHERE 1=1";
             //Subquery to capabilities filter
@@ -137,20 +148,19 @@ public class IaModelRestV1 {
      * @return Customer instance if customer is registered, null if not.
      */
     private static Customer getCustomerRegistered(EntityManager em, String auth){
-        if(auth == null) return null;
+        if(auth.compareTo("") == 0) return null;
         
-        auth = auth.replace("Basic ", "");
-        String decode = Base64.base64Decode(auth);
-        StringTokenizer tokenizer = new StringTokenizer(decode, ":");
-        String username = tokenizer.nextToken();
-        String password = tokenizer.nextToken();
-
         try{
+            auth = auth.replace("Basic ", "");
+            String decode = Base64.base64Decode(auth);
+            StringTokenizer tokenizer = new StringTokenizer(decode, ":");
+            String username = tokenizer.nextToken();
+            String password = tokenizer.nextToken();
             Customer customer = em.createNamedQuery("Customer.findByUserPsw", Customer.class)
                 .setParameter("user", username).setParameter("psw", password).getSingleResult();
             return customer;
         }
-        catch(NoResultException e){
+        catch(NoResultException | NoSuchElementException e){
             return null;
         }
 
