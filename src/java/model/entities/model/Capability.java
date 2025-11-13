@@ -25,7 +25,6 @@ public class Capability implements Serializable {
     @Id
     @SequenceGenerator(name="Cap_Gen", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Cap_Gen")
-    @JsonbTransient
     private int id;
     
     String name;

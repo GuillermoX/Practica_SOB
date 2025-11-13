@@ -20,7 +20,6 @@ public class Provider implements Serializable {
     @Id
     @SequenceGenerator(name="Provider_Gen", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Provider_Gen")
-    @JsonbTransient
     private int id;
     
     private String name;

@@ -4,6 +4,7 @@ import authn.Secured;
 import com.sun.xml.messaging.saaj.util.Base64;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.ws.rs.Consumes;
@@ -21,6 +22,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.StringTokenizer;
 import model.entities.customer.Customer;
+import model.entities.customer.CustomerLinks;
 import model.entities.model.Model;
 
 /*
@@ -45,16 +47,11 @@ public class IaModelRestV1 {
     @Secured
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response create(Model entity) {
-        try{
-            em.persist(entity);
-            URI uri = UriBuilder.fromResource(IaModelRestV1.class)
-                       .path(String.valueOf(entity.getId()))
-                        .build();
-            return Response.created(uri).build();
-        }
-        catch(Exception e){
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
+        em.persist(entity);
+        URI uri = UriBuilder.fromResource(IaModelRestV1.class)
+                   .path(String.valueOf(entity.getId()))
+                    .build();
+        return Response.created(uri).build();     
     }
     
     @GET
@@ -64,10 +61,18 @@ public class IaModelRestV1 {
         Model model = em.find(Model.class, id);
         Response res;
         if(model != null){
-            if(model.isPriv() && !isCustomerRegistered(em, auth))
-                res = Response.status(Response.Status.FORBIDDEN).build();    
-            else
+            Customer cust = getCustomerRegistered(em, auth);    //Get the customer if registered
+            if(model.isPriv() && (cust == null)){                //If private model and customer not registered
+                res = Response.status(Response.Status.FORBIDDEN).build();   
+            }
+            else{ 
+                if(cust != null){       //If customer registered save last model checked
+                    cust.getLinks().setModel("/model/" + id);
+                    em.persist(cust);
+                }
+            
                 res = Response.ok().entity(model).build();
+            }
         }
         else{
             res = Response.status(Response.Status.NOT_FOUND).build();
@@ -126,13 +131,13 @@ public class IaModelRestV1 {
     
     
     /**
-     * Checks if a customer is registered on the system 
+     * Returns a customer registered on the system 
      * @param em EntityManager
      * @param auth authentication "user:password" in Base64 encoding
-     * @return true if customer is registered, false if not.
+     * @return Customer instance if customer is registered, null if not.
      */
-    public static boolean isCustomerRegistered(EntityManager em, String auth){
-        if(auth == null) return false;
+    private static Customer getCustomerRegistered(EntityManager em, String auth){
+        if(auth == null) return null;
         
         auth = auth.replace("Basic ", "");
         String decode = Base64.base64Decode(auth);
@@ -140,9 +145,15 @@ public class IaModelRestV1 {
         String username = tokenizer.nextToken();
         String password = tokenizer.nextToken();
 
-        List<Customer> customer = em.createNamedQuery("Customer.findByUserPsw", Customer.class)
-                .setParameter("user", username).setParameter("psw", password).getResultList();
-        return !customer.isEmpty();
+        try{
+            Customer customer = em.createNamedQuery("Customer.findByUserPsw", Customer.class)
+                .setParameter("user", username).setParameter("psw", password).getSingleResult();
+            return customer;
+        }
+        catch(NoResultException e){
+            return null;
+        }
+
     }
     
 }

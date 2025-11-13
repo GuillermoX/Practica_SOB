@@ -27,7 +27,6 @@ public class Model implements Serializable{
     @Id 
     @SequenceGenerator(name="Model_Gen", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Model_Gen")
-    @JsonbTransient
     private int id;
    
     private String name;

@@ -7,6 +7,7 @@ package model.entities.customer;
 import com.sun.xml.messaging.saaj.util.Base64;
 import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,7 +25,7 @@ import java.io.Serializable;
 @Entity
 @NamedQueries({
     @NamedQuery(name = "Customer.findByUserPsw",
-            query = "SELECT 1 FROM Customer c WHERE c.user = :user AND c.psw = :psw"),
+            query = "SELECT c FROM Customer c WHERE c.user = :user AND c.psw = :psw"),
     @NamedQuery(name = "Customer.findAll",
             query = "SELECT c FROM Customer c")
 })
@@ -34,7 +35,6 @@ public class Customer implements Serializable{
     @Id 
     @SequenceGenerator(name="Customer_Gen", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Customer_Gen")
-    @JsonbTransient
     private int id;
     
     @Column(name="USR")
@@ -43,6 +43,9 @@ public class Customer implements Serializable{
     @Column(name="PSW")
     @JsonbTransient
     private String psw;     //Not secure
+    
+    @Embedded  
+    private CustomerLinks links;
 
     public Customer(){}
 
@@ -62,6 +65,11 @@ public class Customer implements Serializable{
         return psw;
     }
 
+    public CustomerLinks getLinks() {
+        if(this.links == null) this.links = new CustomerLinks();
+        return links;
+    }
+
     
     
     public void setId(int id) {
@@ -74,6 +82,10 @@ public class Customer implements Serializable{
 
     public void setPsw(String psw) {
         this.psw = psw;
+    }
+
+    public void setLinks(CustomerLinks links) {
+        this.links = links;
     }
     
     
