@@ -1,4 +1,4 @@
-package service;
+package service.v1;
 
 import authn.Secured;
 import com.sun.xml.messaging.saaj.util.Base64;
@@ -34,8 +34,7 @@ import model.entities.model.Model;
  */
 @Stateless
 @Path("v1/models")
-public class IAModelREST {
-    
+public class IaModelRestV1 {
     
     @PersistenceContext(unitName = "homework1")
     private EntityManager em;
@@ -48,7 +47,7 @@ public class IAModelREST {
     public Response create(Model entity) {
         try{
             em.persist(entity);
-            URI uri = UriBuilder.fromResource(IAModelREST.class)
+            URI uri = UriBuilder.fromResource(IaModelRestV1.class)
                        .path(String.valueOf(entity.getId()))
                         .build();
             return Response.created(uri).build();
@@ -66,12 +65,12 @@ public class IAModelREST {
         Response res;
         if(model != null){
             if(model.isPriv() && !isCustomerRegistered(em, auth))
-                res = Response.status(401).build();    
+                res = Response.status(Response.Status.FORBIDDEN).build();    
             else
                 res = Response.ok().entity(model).build();
         }
         else{
-            res = Response.status(404).build();    
+            res = Response.status(Response.Status.NOT_FOUND).build();
         }
         
         return res;
@@ -116,16 +115,22 @@ public class IAModelREST {
             if (prov != null && !prov.isEmpty()) {
                 query.setParameter("prov_name", prov);
             }
-            
+
             List<Model> models = query.getResultList();
-            
+
             return Response.ok().entity(models).build();
         
     }
 
 
     
-        
+    
+    /**
+     * Checks if a customer is registered on the system 
+     * @param em EntityManager
+     * @param auth authentication "user:password" in Base64 encoding
+     * @return true if customer is registered, false if not.
+     */
     public static boolean isCustomerRegistered(EntityManager em, String auth){
         if(auth == null) return false;
         

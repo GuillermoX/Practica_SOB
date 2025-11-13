@@ -1,4 +1,4 @@
-package service.FormatAdapters;
+package service.v1.formatAdapter;
 
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import java.text.SimpleDateFormat;

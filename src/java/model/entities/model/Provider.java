@@ -4,6 +4,7 @@
  */
 package model.entities.model;
 
+import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.persistence.*;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
@@ -19,6 +20,7 @@ public class Provider implements Serializable {
     @Id
     @SequenceGenerator(name="Provider_Gen", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Provider_Gen")
+    @JsonbTransient
     private int id;
     
     private String name;

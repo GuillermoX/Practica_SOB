@@ -4,6 +4,7 @@
  */
 package model.entities.model;
 
+import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,6 +24,7 @@ public class License implements Serializable{
     @Id
     @SequenceGenerator(name="License_Gen", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "License_Gen")
+    @JsonbTransient
     private int id;
     
     String name;

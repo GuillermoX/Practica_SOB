@@ -4,6 +4,7 @@
  */
 package model.entities.model;
 
+import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.persistence.*;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
@@ -13,9 +14,7 @@ import java.util.Collection;
 import java.util.Date;
 //import java.util.Date;
 import java.util.LinkedList;
-import service.FormatAdapters.CapabilityAdapter;
-import service.FormatAdapters.DateAdapter;
-import service.FormatAdapters.LicenseAdapter;
+
 /**
  *
  * @author guillermo
@@ -28,6 +27,7 @@ public class Model implements Serializable{
     @Id 
     @SequenceGenerator(name="Model_Gen", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Model_Gen")
+    @JsonbTransient
     private int id;
    
     private String name;
