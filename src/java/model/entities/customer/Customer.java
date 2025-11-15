@@ -27,7 +27,7 @@ import java.io.Serializable;
     @NamedQuery(name = "Customer.findByUserPsw",
             query = "SELECT c FROM Customer c WHERE c.user = :user AND c.psw = :psw"),
     @NamedQuery(name = "Customer.findAll",
-            query = "SELECT c FROM Customer c")
+            query = "SELECT c FROM Customer c") 
 })
 @XmlRootElement
 public class Customer implements Serializable{

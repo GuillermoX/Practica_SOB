@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Date;
 //import java.util.Date;
 import java.util.LinkedList;
+import service.v1.formatAdapter.DateAdapter;
 
 /**
  *
@@ -41,6 +42,8 @@ public class Model implements Serializable{
     
     @Temporal(TemporalType.DATE)
     @Column(name="TRAIN_D")
+
+    
     private Date trainingDate;  
     
     @Temporal(TemporalType.DATE)
@@ -74,9 +77,9 @@ public class Model implements Serializable{
         float qi = m.getQualityIndex();
         int nLang = m.getNumLanguages();
         
-        return((m.getName().isBlank() && m.getDescription().isBlank() &&
-                m.getDescription().isBlank() && m.getVersion().isBlank() &&
-                m.getVersion().isBlank() && (qi>=0) && (qi<=1) && (nLang>0) && 
+        return((!(m.getName().isBlank() || m.getDescription().isBlank() ||
+                m.getDescription().isBlank() || m.getVersion().isBlank() ||
+                m.getVersion().isBlank()) && (qi>=0) && (qi<=1) && (nLang>0) && 
                (nLang<300) && (m.getContextLenght()>0)));
         
     }
@@ -160,10 +163,12 @@ public class Model implements Serializable{
         this.qualityIndex = qualityIndex;
     }
 
+    @XmlJavaTypeAdapter(value = DateAdapter.class, type = Date.class)
     public void setTrainingDate(Date trainingDate) {
         this.trainingDate = trainingDate;
     }
-
+    
+    @XmlJavaTypeAdapter(value = DateAdapter.class, type = Date.class)
     public void setLastUpdateDate(Date lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
     }

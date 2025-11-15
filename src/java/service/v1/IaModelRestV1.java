@@ -1,5 +1,6 @@
 package service.v1;
 
+import authn.BasicAuthDecoder;
 import authn.Secured;
 import com.sun.xml.messaging.saaj.util.Base64;
 import jakarta.ejb.Stateless;
@@ -20,14 +21,11 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriBuilder;
-import java.net.URI;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.StringTokenizer;
 import model.entities.customer.Customer;
-import model.entities.customer.CustomerLinks;
 import model.entities.model.Model;
+import service.entitiesServices.CustomerService;
+import service.entitiesServices.ModelService;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -50,33 +48,39 @@ public class IaModelRestV1 {
     @POST
     @Secured
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response create(Model entity) {
-        if(!Model.checkValues(entity))
+    public Response create(Model model) {
+        ModelService ms = new ModelService(em);
+        if(!ms.create(model))
             return Response.status(Response.Status.BAD_REQUEST).entity("Unreasonable model values").build();
-        em.persist(entity);
-        URI uri = UriBuilder.fromResource(IaModelRestV1.class)
-                   .path(String.valueOf(entity.getId()))
-                    .build();
-        return Response.created(uri).build();     
+        else
+            return Response.status(Response.Status.CREATED).entity(model).build(); 
     }
+
     
     @GET
     @Path("{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response find(@PathParam("id") int id,  @DefaultValue("") @HeaderParam(HttpHeaders.AUTHORIZATION) String auth) {
-        Model model = em.find(Model.class, id);
+        ModelService ms = new ModelService(em);
+        CustomerService cs = new CustomerService(em);
         Response res;
-        if(model != null){
-            Customer cust = getCustomerRegistered(em, auth);    //Get the customer if registered
-            if(model.isPriv() && (cust == null)){                //If private model and customer not registered
+        
+        Model model = ms.find(id);
+        if(model != null){    //If model found
+            Customer cust = null;
+            
+            BasicAuthDecoder decoder = new BasicAuthDecoder();
+            List<String> nameAndPsw = decoder.decode(auth);
+            if(nameAndPsw != null)   //If auth decoded correctly
+                cust = cs.findByNameAndPsw(nameAndPsw.get(0), nameAndPsw.get(1));    //Get the customer
+            
+            if(model.isPriv() && (cust == null)){     //If private model and customer not registered
                 res = Response.status(Response.Status.FORBIDDEN).build();   
             }
             else{ 
-                if(cust != null){       //If customer registered save last model checked
-                    cust.getLinks().setModel("/model/" + id);
-                    em.persist(cust);
-                }
-            
+                if(cust != null)       //If customer registered save last model checked
+                    cs.setLastModel(cust, model, "/models/");
+                
                 res = Response.ok().entity(model).build();
             }
         }
@@ -90,80 +94,12 @@ public class IaModelRestV1 {
     
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response findQuery(
-                                @QueryParam("capability") List<String> caps,
-                                @QueryParam("provider") String prov
-                            ) {
-            //Initialize capabilities variables
-            String cap1 = null;
-            String cap2 = null;
-            if(caps.size() == 1) cap1 = caps.get(0);
-            if(caps.size() == 2) cap2 = caps.get(1);
-        
-            //General query
-            String jpql = "SELECT m FROM Model m WHERE 1=1";
-            //Subquery to capabilities filter
-            String subpql = " (SELECT c.name FROM Model m2 JOIN m2.capabilities c WHERE m2.name = m.name)";
-            
-            //Only insert the condition if filter specified
-            if (cap1 != null && !cap1.isEmpty()) {
-                jpql += " AND :cap1_name IN" + subpql;
-            }
-            if (cap2 != null && !cap2.isEmpty()) {
-                jpql += " AND :cap2_name IN" + subpql;
-            }
-            if (prov != null && !prov.isEmpty()) {
-                jpql += " AND m.provider.name = :prov_name";
-            }
-            
-            jpql += " ORDER BY m.name";
-            
-            //Create the query
-            TypedQuery<Model> query = em.createQuery(jpql, Model.class);
-            
-            //Only insert the parameter if specified
-            if (cap1 != null && !cap1.isEmpty()) {
-                query.setParameter("cap1_name", cap1);
-            }
-            if (cap2 != null && !cap2.isEmpty()) {
-                query.setParameter("cap2_name", cap2);
-            }
-            if (prov != null && !prov.isEmpty()) {
-                query.setParameter("prov_name", prov);
-            }
-
-            List<Model> models = query.getResultList();
-
-            return Response.ok().entity(models).build();
+    public Response findQuery(@QueryParam("capability") List<String> caps, @QueryParam("provider") String prov) {
+        ModelService ms = new ModelService(em);
+        List<Model> models = ms.findFiltered(caps, prov);
+        return Response.ok().entity(models).build();
         
     }
 
-
-    
-    
-    /**
-     * Returns a customer registered on the system 
-     * @param em EntityManager
-     * @param auth authentication "user:password" in Base64 encoding
-     * @return Customer instance if customer is registered, null if not.
-     */
-    private static Customer getCustomerRegistered(EntityManager em, String auth){
-        if(auth.compareTo("") == 0) return null;
-        
-        try{
-            auth = auth.replace("Basic ", "");
-            String decode = Base64.base64Decode(auth);
-            StringTokenizer tokenizer = new StringTokenizer(decode, ":");
-            String username = tokenizer.nextToken();
-            String password = tokenizer.nextToken();
-            Customer customer = em.createNamedQuery("Customer.findByUserPsw", Customer.class)
-                .setParameter("user", username).setParameter("psw", password).getSingleResult();
-            return customer;
-        }
-        catch(NoResultException | NoSuchElementException e){
-            return null;
-        }
-
-    }
     
 }
